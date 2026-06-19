@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AlbionKillnet.Api/AlbionKillnet.Api.csproj" />
+    <Project Path="src/AlbionKillnet.Core/AlbionKillnet.Core.csproj" />
+  </Folder>
+</Solution>
