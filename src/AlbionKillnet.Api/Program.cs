@@ -36,7 +36,7 @@ app.UseSwaggerUI(c =>
 
 app.UseCors("ReactAppPolicy");
 
-app.Map("/", () => Results.Redirect("/swagger"));
+app.MapGet("/health", () => Results.Ok("Motor aktif ve saglikli!"));
 
 app.MapHomepageApi();
 app.MapKillEventApi();
