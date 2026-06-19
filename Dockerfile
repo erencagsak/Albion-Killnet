@@ -1,17 +1,24 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-
-COPY *.csproj ./
-RUN dotnet restore
-
-COPY . ./
-RUN dotnet publish -c Release -o out
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
-WORKDIR /app
-COPY --from=build /app/out .
-
 EXPOSE 8080
-ENV ASPNETCORE_URLS=http://+:8080
 
-ENTRYPOINT ["dotnet", "AlbionKillnet.Worker.dll"]
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY ["src/AlbionKillnet.Api/AlbionKillnet.Api.csproj", "src/AlbionKillnet.Api/"]
+COPY ["src/AlbionKillnet.Core/AlbionKillnet.Core.csproj", "src/AlbionKillnet.Core/"]
+
+RUN dotnet restore "src/AlbionKillnet.Api/AlbionKillnet.Api.csproj"
+
+COPY . .
+
+WORKDIR "/src/src/AlbionKillnet.Api"
+RUN dotnet build "AlbionKillnet.Api.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "AlbionKillnet.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "AlbionKillnet.Api.dll"]
